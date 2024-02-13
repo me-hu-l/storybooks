@@ -15,10 +15,39 @@ const userSchema = mongoose.Schema({
                 type: String,
                 required: true
         },
+        followers: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'User'
+                }
+        ],
+        following: [
+                {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'User'
+                }
+        ],
+        pendingRequests: [
+                {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'User'
+                }
+        ],
+        pendingSentRequests: [
+                {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'User'
+                }
+        ]
         
 }, {
         timestamps: true
 })
+
+userSchema.virtual('followerCount').get(function() {
+        return this.followers.length;
+    });
+    
 
 userSchema.pre('save', async function(next) {
         if(!this.isModified('password')){
