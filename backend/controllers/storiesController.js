@@ -32,7 +32,7 @@ const addStory = asyncHandler(async (req, res) => {
 const getPublicStories = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("following");
 
-  const followingIds = user.following
+  const followingIds = user.following;
 
   const stories = await Story.find({
     $or: [
@@ -104,7 +104,9 @@ const getSpecificStory = asyncHandler(async (req, res) => {
 
   if (
     !story ||
-    (story[0].status === "private" && !followingIds.includes(story[0].user._id))
+    (story[0].status === "private" &&
+      !followingIds.includes(story[0].user._id) &&
+      !story[0].user._id.equals(req.user._id))
   ) {
     res.status(404);
     throw new Error("Story not found");
@@ -185,7 +187,6 @@ const deleteStory = asyncHandler(async (req, res) => {
 // route GET /api/stories/user/:userId
 // @access private
 const getUserStories = asyncHandler(async (req, res) => {
-
   const user = await User.findById(req.user._id).select("following");
 
   const followingIds = user.following;
@@ -194,7 +195,6 @@ const getUserStories = asyncHandler(async (req, res) => {
   const targetUserId = req.params.userId;
 
   const isFollowing = followingIds.some((id) => id.equals(targetUserId));
-
 
   let pipeline;
 
@@ -263,7 +263,6 @@ const getUserStories = asyncHandler(async (req, res) => {
     user: req.user,
     stories: stories,
   });
-
 });
 
 export {
