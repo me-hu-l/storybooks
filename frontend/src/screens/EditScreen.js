@@ -1,123 +1,111 @@
-import React from 'react'
+import React from "react";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useGetSpecificStoryMutation } from '../slices/storiesApiSlice';
-import { useUpdateStoryMutation } from '../slices/storiesApiSlice';
-import Loader from '../components/Loader';
+import { useGetSpecificStoryMutation } from "../slices/storiesApiSlice";
+import { useUpdateStoryMutation } from "../slices/storiesApiSlice";
+import Loader from "../components/Loader";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-
+import { Form, Button } from "react-bootstrap";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { LinkContainer } from "react-router-bootstrap";
 
 const EditScreen = () => {
-        const { id } = useParams();
+  const { id } = useParams();
 
-        const [title, setTitle] = useState("");
-        const [status, setStatus] = useState("public");
-        const [body, setBody] = useState("")
+  const [title, setTitle] = useState("");
+  const [status, setStatus] = useState("public");
+  const [body, setBody] = useState("");
 
-        const [getSpecificStory, {isLoading1}] = useGetSpecificStoryMutation();
-        const [updateStory, {isLoading2}] = useUpdateStoryMutation();
+  const [getSpecificStory, { isLoading1 }] = useGetSpecificStoryMutation();
+  const [updateStory, { isLoading2 }] = useUpdateStoryMutation();
 
-        const navigate = useNavigate();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let res = await getSpecificStory({ id }).unwrap();
+        res = res.stories[0];
+        setTitle(res.title);
+        setStatus(res.status);
+        setBody(res.body);
+      } catch (error) {
+        toast.error(error?.data?.message || error.error);
+      }
+    };
 
-        useEffect(() => {
+    fetchData();
+  }, []);
 
-                const fetchData = async () =>{
-                        try {
-                                const res = await getSpecificStory({ id }).unwrap();
-                                setTitle(res.stories.title)
-                                setStatus(res.stories.status)
-                                setBody(res.stories.body)
-                              } catch (error) {
-                                toast.error(error?.data?.message || error.error);
-                              }
-                }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-                fetchData();
-              }, []);
+    try {
+      const res = await updateStory({
+        title,
+        status,
+        body,
+        id,
+      }).unwrap();
+      navigate("/dashboard");
+      toast.success("Story Updated");
+    } catch (error) {
+      toast.error(error?.data?.message || error.error);
+    }
+  };
 
-
-
-        const handleSubmit = async (event) => {
-                event.preventDefault();
-                
-                try {
-                        const res = await updateStory({
-                        title,
-                        status,
-                        body,
-                        id
-                        }).unwrap();
-                        navigate('/dashboard')
-                        toast.success("Story Updated");
-                } catch (error) {
-                        toast.error(error?.data?.message || error.error);
-                }
-        };
-
-        if(isLoading1){
-                return <Loader />
-        }
+  if (isLoading1) {
+    return <Loader />;
+  }
 
   return (
-        <div>
-        <h3>Edit Story</h3>
-        <div className="row">
-          <form onSubmit={handleSubmit} className="col s12">
-            <div className="row">
-              <div className="input-field">
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-                <label htmlFor="title">Title</label>
-              </div>
-            </div>
-  
-            <div className="row">
-              <div className="input-field">
-                <select
-                  id="status"
-                  name="status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                >
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-                </select>
-                <label htmlFor="status">Status</label>
-              </div>
-            </div>
-  
-            <div className="row">
-              <div className="input-field">
-                <h5>Tell Us Your Story:</h5>
-                <textarea
-                  id="body"
-                  name="body"
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                ></textarea>
-              </div>
-            </div>
-  
-            <div className="row">
-              <button type="submit" className="btn">
-                Save
-              </button>
-              <a href="/dashboard" className="btn orange">
-                Cancel
-              </a>
-            </div>
-          </form>
-        </div>
-      </div>
-  )
-}
+    <div>
+      <h3>Edit Story</h3>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="title">
+          <Form.Label>Title</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </Form.Group>
 
-export default EditScreen
+        <Form.Group controlId="status">
+          <Form.Label>Status</Form.Label>
+          <Form.Control
+            as="select"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </Form.Control>
+        </Form.Group>
+
+        <Form.Group controlId="body">
+          <Form.Label>Tell Us Your Story:</Form.Label>
+          <CKEditor
+            editor={ClassicEditor}
+            data={body}
+            onChange={(event, editor) => setBody(editor.getData())}
+          />
+        </Form.Group>
+
+        <Button variant="primary" type="submit">
+          Save
+        </Button>
+        <LinkContainer to="/dashboard">
+          <Button variant="danger" className="ml-2">
+            Cancel
+          </Button>
+        </LinkContainer>
+      </Form>
+    </div>
+  );
+};
+
+export default EditScreen;

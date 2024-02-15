@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-const USERS_URL = "api/users";
+const USERS_URL = "/api/users";
 
 export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -30,6 +30,54 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    followUser: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/follow/${data.targetUserId}`,
+        method: "POST",
+      }),
+    }),
+    acceptFollowRequest: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/accept-follow/${data.followerUserId}`,
+        method: "PUT",
+      }),
+    }),
+    rejectFollowRequest: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/reject-follow/${data.followerUserId}`,
+        method: "PUT",
+      }),
+    }),
+    getFollowers: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/followers/${data.userId}`,
+        method: "GET",
+      }),
+    }),
+    getFollowing: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/following/${data.userId}`,
+        method: "GET",
+      }),
+    }),
+    getPendingRequests: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/pending-requests/${data.userId}`,
+        method: "GET",
+      }),
+    }),
+    getPendingSentRequests: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/pending-sent-requests/${data.userId}`,
+        method: "GET",
+      }),
+    }),
+    unfollowUser: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/unfollow/${data.targetUserId}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -38,4 +86,12 @@ export const {
   useLogoutMutation,
   useRegisterMutation,
   useUpdateUserMutation,
+  useFollowUserMutation,
+  useAcceptFollowRequestMutation,
+  useRejectFollowRequestMutation,
+  useGetFollowersMutation,
+  useGetFollowingMutation,
+  useGetPendingRequestsMutation,
+  useGetPendingSentRequestsMutation,
+  useUnfollowUserMutation,
 } = usersApiSlice;

@@ -36,6 +36,11 @@ const Header = () => {
             <Nav className="ms-auto">
               {userInfo ? (
                 <>
+                  <LinkContainer to="/notifications">
+                    <Nav.Link>
+                      <i className="fas fa-bell"></i>
+                    </Nav.Link>
+                  </LinkContainer>
                   <NavDropdown title={userInfo.name} id="username">
                     <LinkContainer to={`/profile/${userInfo._id}`}>
                       <NavDropdown.Item>Profile</NavDropdown.Item>
@@ -45,6 +50,9 @@ const Header = () => {
                     </LinkContainer>
                     <LinkContainer to="/stories">
                       <NavDropdown.Item>Public Stories</NavDropdown.Item>
+                    </LinkContainer>
+                    <LinkContainer to={`/friends/${userInfo._id}`}>
+                      <NavDropdown.Item>Friends</NavDropdown.Item>
                     </LinkContainer>
                     <NavDropdown.Item onClick={logoutHandler}>
                       Logout

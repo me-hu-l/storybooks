@@ -23,6 +23,9 @@ import StoryScreen from "./screens/StoryScreen.js";
 import AddScreen from "./screens/AddScreen.js";
 import EditScreen from "./screens/EditScreen.js";
 import UserStories from "./screens/UserStories.js";
+import Notifications from "./screens/Notifications.js";
+import FriendsScreen from "./screens/FriendsScreen.js";
+// import "bootstrap/dist/css/bootstrap.min.css";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,6 +42,8 @@ const router = createBrowserRouter(
         <Route path="/stories/add" element={<AddScreen />} />
         <Route path="/stories/edit/:id" element={<EditScreen />} />
         <Route path="/stories/user/:userId" element={<UserStories />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/friends/:userId" element={<FriendsScreen />} />
       </Route>
     </Route>
   )

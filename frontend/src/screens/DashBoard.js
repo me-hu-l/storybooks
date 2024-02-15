@@ -11,14 +11,17 @@ import { useGetPersonalStoriesMutation } from "../slices/rootApiSlice";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import Loader from "../components/Loader";
-import { Button } from "react-bootstrap";
+// import { Button } from "react-bootstrap";
 import { useDeleteStoryMutation } from "../slices/storiesApiSlice";
+import { Button, Badge, Table } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import { Link } from "react-router-dom";
 
 const DashBoard = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   const [getPersonalStories, { isLoading }] = useGetPersonalStoriesMutation();
-  const [deleteStory, {isLoading2}] = useDeleteStoryMutation();
+  const [deleteStory, { isLoading2 }] = useDeleteStoryMutation();
 
   const [stories, setStories] = useState();
 
@@ -37,7 +40,7 @@ const DashBoard = () => {
 
   const handleDelete = async (storyId) => {
     try {
-      await deleteStory({storyId}).unwrap();
+      await deleteStory({ storyId }).unwrap();
       toast.success("Story deleted successfully");
       // After successful deletion, fetch stories again or update state accordingly
       // Here, I'm refetching the stories for simplicity
@@ -48,7 +51,6 @@ const DashBoard = () => {
     }
   };
 
-
   if (!stories) {
     return <Loader />;
   }
@@ -57,24 +59,26 @@ const DashBoard = () => {
     <>
       <h6>Dashboard</h6>
       <h3>Welcome {userInfo.name}</h3>
-      <p>Here are you stories</p>
-      <MDBTable align="middle">
-        <MDBTableHead>
+      <p>Here are your stories</p>
+      <Table striped bordered hover responsive>
+        <thead>
           <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Date</th>
-            <th scope="col">Status</th>
-            <th scope="col">Actions</th>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
           </tr>
-        </MDBTableHead>
-        <MDBTableBody>
+        </thead>
+        <tbody>
           {stories.map((story, index) => (
-            <tr>
+            <tr key={index}>
               <td>
                 <div className="ms-3">
-                  <a href={`/stories/${story._id}`}>
-                    <p className="fw-bold mb-1">{story.title}</p>
-                  </a>
+                  <LinkContainer to={`/stories/${story._id}`}>
+                    <Link>
+                      <p className="fw-bold mb-1">{story.title}</p>
+                    </Link>
+                  </LinkContainer>
                 </div>
               </td>
               <td>
@@ -82,25 +86,33 @@ const DashBoard = () => {
               </td>
               <td>
                 {story.status === "public" ? (
-                  <MDBBadge color="success" pill>
+                  <Badge bg="success" style={{ color: "white" }}>
                     {story.status}
-                  </MDBBadge>
+                  </Badge>
                 ) : (
-                  <MDBBadge color="primary" pill>
+                  <Badge bg="primary" style={{ color: "white" }}>
                     {story.status}
-                  </MDBBadge>
+                  </Badge>
                 )}
               </td>
               <td>
-                <a href={`/stories/edit/${story._id}`}>
+                <LinkContainer to={`/stories/edit/${story._id}`}>
+                  <Link>
                   <Button variant="primary">Edit</Button>
-                </a>
-                <Button variant="danger" onClick={() => handleDelete(story._id)}>Delete</Button>
+                  </Link>
+                </LinkContainer>
+                
+                <Button
+                  variant="danger"
+                  onClick={() => handleDelete(story._id)}
+                >
+                  Delete
+                </Button>
               </td>
             </tr>
           ))}
-        </MDBTableBody>
-      </MDBTable>
+        </tbody>
+      </Table>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-const ROOT_URL = "api";
+const ROOT_URL = "/api";
 
 export const rootApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

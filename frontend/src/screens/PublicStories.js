@@ -4,15 +4,19 @@ import { useGetPersonalStoriesMutation } from "../slices/rootApiSlice";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import Loader from "../components/Loader";
-import { Button } from "react-bootstrap";
+// import { Button } from "react-bootstrap";
 import { useGetPublicStoriesMutation } from "../slices/storiesApiSlice";
 import EditIcon from "../components/EditIcon";
+import { Card, Button } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 
 const PublicStories = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   const [getPublicStories, { isLoading }] = useGetPublicStoriesMutation();
 
+  const navigate = useNavigate();
   const [stories, setStories] = useState();
 
   useEffect(() => {
@@ -36,38 +40,42 @@ const PublicStories = () => {
     <>
       <h1>Stories</h1>
       {stories.length ? (
-        <div class="row">
-          {stories.map((story, index) => {
-            return (
-              <div class="col s12 m4">
-                <div class="card">
-                  <div class="card-image">
-                    <EditIcon
-                      storyUser={story.user}
-                      loggedUser={userInfo}
-                      storyId={story._id}
-                      floating={true}
-                    />
-                  </div>
-                  <div class="card-content center-align">
-                    <h5>{story.title}</h5>
-                    <br />
-                    <div class="chip">
-                      <p>{story.body}</p>
-                      <a href={`/stories/user/${story.user._id}`}>
-                        {story.user.name}
-                      </a>
-                    </div>
-                  </div>
-                  <div class="card-action center-align">
-                    <a href={`/stories/${story._id}`} class="btn grey">
-                      Read More
-                    </a>
-                  </div>
+        <div className="row">
+          {stories.map((story, index) => (
+            <div key={index} className="col-sm-12 col-md-4">
+              <Card>
+                {/* <Card.Img variant="top" src={story.image} alt="Story Image" /> */}
+                <div className="position-relative">
+                  <EditIcon
+                    storyUser={story.user}
+                    loggedUser={userInfo}
+                    storyId={story._id}
+                    floating={true}
+                  />
                 </div>
-              </div>
-            );
-          })}
+                <Card.Body>
+                  <Card.Title>
+                    <h3>{story.title}</h3>
+                  </Card.Title>
+                  <Card.Text
+                    dangerouslySetInnerHTML={{
+                      __html: story.body.substring(0, 50) + "...",
+                    }}
+                  />
+                  <div className="chip">
+                    <LinkContainer to={`/stories/user/${story.user._id}`}>
+                      <Link>{story.user.name}</Link>
+                    </LinkContainer>
+                  </div>
+                </Card.Body>
+                <Card.Footer className="text-center">
+                  <LinkContainer to={`/stories/${story._id}`}>
+                    <Button variant="outline-secondary">Read More</Button>
+                  </LinkContainer>
+                </Card.Footer>
+              </Card>
+            </div>
+          ))}
         </div>
       ) : (
         <p>No stories to display</p>
